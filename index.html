@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Приглашение 💌</title>
+<title>Пара вопросов 💌</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
@@ -12,120 +12,250 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
     overflow: hidden;
     position: relative;
     padding: 20px;
+    transition: background 0.8s;
   }
   .card {
     background: #fff;
-    padding: 30px 25px;
-    border-radius: 24px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    padding: 35px 28px;
+    border-radius: 26px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.18);
     text-align: center;
-    max-width: 380px;
+    max-width: 400px;
     width: 100%;
     z-index: 10;
+    position: relative;
   }
-  h1 { color: #d6336c; font-size: 22px; margin: 0 0 15px; }
-  p  { color: #555; font-size: 16px; line-height: 1.5; margin: 0 0 25px; }
-  .buttons {
+  .progress {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #ffd5dd;
+    transition: background 0.3s;
+  }
+  .dot.active { background: #d6336c; }
+  .dot.done   { background: #ff8fab; }
+
+  .step { display: none; animation: fadeIn 0.5s ease; }
+  .step.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 { color: #d6336c; font-size: 22px; margin: 15px 0 12px; }
+  p  { color: #666; font-size: 16px; line-height: 1.5; margin: 0 0 25px; }
+
+  .row {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    position: relative;
-    min-height: 60px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
   button {
     padding: 14px 28px;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    transition: transform 0.15s;
+    transition: transform 0.15s, box-shadow 0.2s;
   }
-  #yes {
+  .btn-yes {
     background: #51cf66;
     color: #fff;
-    box-shadow: 0 6px 18px rgba(81,207,102,0.4);
+    box-shadow: 0 6px 18px rgba(81,207,102,0.35);
   }
-  #yes:active { transform: scale(0.95); }
-  #no {
+  .btn-no {
+    background: #e9ecef;
+    color: #495057;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  }
+  button:active { transform: scale(0.95); }
+
+  /* Финальный экран */
+  #no-runaway {
     background: #e9ecef;
     color: #495057;
     position: fixed;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     transition: left 0.15s, top 0.15s;
+    z-index: 999;
   }
   .done {
     display: none;
     color: #d6336c;
     font-size: 20px;
     font-weight: 700;
-    animation: pop 0.5s ease;
+    animation: pop 0.6s ease;
   }
   @keyframes pop {
     0% { transform: scale(0.3); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* Сердечки на фоне */
+  .heart {
+    position: fixed;
+    color: rgba(255,255,255,0.5);
+    pointer-events: none;
+    animation: floatUp linear infinite;
+    font-size: 22px;
+  }
+  @keyframes floatUp {
+    from { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.8; }
+    to   { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
   }
 </style>
 </head>
 <body>
 
 <div class="card">
-  <div id="question">
+  <div class="progress">
+    <div class="dot active" data-i="0"></div>
+    <div class="dot" data-i="1"></div>
+    <div class="dot" data-i="2"></div>
+    <div class="dot" data-i="3"></div>
+  </div>
+
+  <!-- Шаг 1 -->
+  <div class="step active" data-step="0">
     <h1>Привет 🌸</h1>
-    <p>Ты мне очень нравишься.<br>Хочу пригласить тебя на свидание.<br><b>Пойдёшь?</b></p>
-    <div class="buttons">
-      <button id="yes">Да ❤️</button>
-      <button id="no">Нет</button>
+    <p>Можно задать тебе пару вопросов?</p>
+    <div class="row">
+      <button class="btn-yes" onclick="next()">Да, конечно</button>
+      <button class="btn-no" onclick="next()">Ну давай</button>
     </div>
   </div>
-  <div class="done" id="done">Урааа! 🎉<br>Я самый счастливый!</div>
+
+  <!-- Шаг 2 -->
+  <div class="step" data-step="1">
+    <h1>Вопрос 1 из 2</h1>
+    <p>Ты сегодня в хорошем настроении?</p>
+    <div class="row">
+      <button class="btn-yes" onclick="next()">Да 😊</button>
+      <button class="btn-no" onclick="next()">Так себе</button>
+    </div>
+  </div>
+
+  <!-- Шаг 3 -->
+  <div class="step" data-step="2">
+    <h1>Вопрос 2 из 2</h1>
+    <p>Любишь неожиданные сюрпризы?</p>
+    <div class="row">
+      <button class="btn-yes" onclick="next()">Обожаю 🎁</button>
+      <button class="btn-no" onclick="next()">Смотря какие</button>
+    </div>
+  </div>
+
+  <!-- Финальный шаг -->
+  <div class="step" data-step="3" id="final-step">
+    <h1>Ну что ж...</h1>
+    <p>Ты мне очень нравишься.<br>Хочу пригласить тебя на свидание.<br><b>Пойдёшь?</b></p>
+    <div class="row" id="final-row">
+      <button class="btn-yes" onclick="sayYes()">Да ❤️</button>
+      <button class="btn-no" id="no-runaway">Нет</button>
+    </div>
+  </div>
+
+  <div class="done" id="done">
+    Урааа! 🎉<br>Я самый счастливый!
+  </div>
 </div>
 
 <script>
-  const noBtn = document.getElementById('no');
+  const dots = document.querySelectorAll('.dot');
+  let current = 0;
 
-  function runAway() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    const bw = noBtn.offsetWidth;
-    const bh = noBtn.offsetHeight;
+  function next() {
+    const steps = document.querySelectorAll('.step');
+    steps[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    dots[current].classList.add('done');
 
-    // Случайная позиция, чтобы кнопка не вылезала за экран
-    const x = Math.random() * (w - bw - 20) + 10;
-    const y = Math.random() * (h - bh - 20) + 10;
+    current++;
 
-    noBtn.style.left = x + 'px';
-    noBtn.style.top  = y + 'px';
+    if (steps[current]) {
+      steps[current].classList.add('active');
+      dots[current].classList.add('active');
+
+      // Меняем градиент фона для разнообразия
+      const gradients = [
+        'linear-gradient(135deg,#ffdde1,#ee9ca7)',
+        'linear-gradient(135deg,#e0c3fc,#8ec5fc)',
+        'linear-gradient(135deg,#fbc2eb,#a6c1ee)',
+        'linear-gradient(135deg,#ff9a9e,#fecfef)'
+      ];
+      document.body.style.background = gradients[current] || gradients[3];
+
+      if (current === 3) initRunaway();
+    }
   }
 
-  // Ставим кнопку в случайное место сразу при загрузке
-  window.addEventListener('load', () => {
-    // небольшая задержка, чтобы размеры посчитались корректно
+  // Убегающая кнопка
+  function initRunaway() {
+    const noBtn = document.getElementById('no-runaway');
+    if (!noBtn) return;
+
+    function runAway(e) {
+      if (e) e.preventDefault();
+      const w = window.innerWidth, h = window.innerHeight;
+      const bw = noBtn.offsetWidth, bh = noBtn.offsetHeight;
+      const x = Math.random() * (w - bw - 20) + 10;
+      const y = Math.random() * (h - bh - 20) + 10;
+      noBtn.style.left = x + 'px';
+      noBtn.style.top  = y + 'px';
+    }
+
     setTimeout(runAway, 50);
-  });
+    noBtn.addEventListener('mouseover', runAway);
+    noBtn.addEventListener('touchstart', runAway);
+    noBtn.addEventListener('click', runAway);
+  }
 
-  // Убегает при наведении (ПК) и при касании (телефон)
-  noBtn.addEventListener('mouseover', runAway);
-  noBtn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    runAway();
-  });
-  // На случай клика — тоже убегает
-  noBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    runAway();
-  });
-
-  // Нажатие "Да"
-  document.getElementById('yes').addEventListener('click', () => {
-    document.getElementById('question').style.display = 'none';
+  // Финальный ответ
+  function sayYes() {
+    document.getElementById('final-step').style.display = 'none';
     document.getElementById('done').style.display = 'block';
-    noBtn.style.display = 'none';
-  });
+    const noBtn = document.getElementById('no-runaway');
+    if (noBtn) noBtn.style.display = 'none';
+    dots.forEach(d => d.classList.add('done'));
+
+    // Взрыв сердечек
+    for (let i = 0; i < 20; i++) spawnHeart();
+  }
+
+  // Фоновые сердечки
+  function spawnHeart() {
+    const h = document.createElement('div');
+    h.className = 'heart';
+    h.textContent = ['❤️','💕','💖','💗','🌸'][Math.floor(Math.random()*5)];
+    h.style.left = Math.random() * 100 + 'vw';
+    h.style.fontSize = (16 + Math.random() * 24) + 'px';
+    h.style.animationDuration = (5 + Math.random() * 5) + 's';
+    h.style.animationDelay = Math.random() * 1 + 's';
+    document.body.appendChild(h);
+    setTimeout(() => h.remove(), 12000);
+  }
+
+  // Постоянный лёгкий фон сердечек
+  setInterval(() => {
+    if (document.querySelectorAll('.heart').length < 15) spawnHeart();
+  }, 1500);
 </script>
 
 </body>
