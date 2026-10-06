@@ -1,142 +1,132 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Приглашение на свидание</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #fce4ec; /* Нежно-розовый фон */
-            font-family: 'Arial', sans-serif;
-            overflow: hidden; /* Чтобы кнопка не создавала скролл */
-            position: relative;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 80%;
-            z-index: 10;
-        }
-        h1 {
-            color: #d81b60;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        p {
-            color: #555;
-            font-size: 16px;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            position: relative;
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-        }
-        #yes-btn {
-            background-color: #4caf50;
-            color: white;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-        }
-        #yes-btn:active {
-            transform: scale(0.95);
-        }
-        #no-btn {
-            background-color: #e0e0e0;
-            color: #333;
-            position: absolute; /* Важно для свободного перемещения */
-            transition: all 0.1s ease; /* Быстрая реакция */
-        }
-        .success-message {
-            display: none;
-            color: #4caf50;
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 20px;
-            animation: pop 0.5s ease;
-        }
-        @keyframes pop {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Приглашение 💌</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    position: relative;
+    padding: 20px;
+  }
+  .card {
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    z-index: 10;
+  }
+  h1 { color: #d6336c; font-size: 22px; margin: 0 0 15px; }
+  p  { color: #555; font-size: 16px; line-height: 1.5; margin: 0 0 25px; }
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+    min-height: 60px;
+  }
+  button {
+    padding: 14px 28px;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  #yes {
+    background: #51cf66;
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(81,207,102,0.4);
+  }
+  #yes:active { transform: scale(0.95); }
+  #no {
+    background: #e9ecef;
+    color: #495057;
+    position: fixed;
+    transition: left 0.15s, top 0.15s;
+  }
+  .done {
+    display: none;
+    color: #d6336c;
+    font-size: 20px;
+    font-weight: 700;
+    animation: pop 0.5s ease;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.3); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+</style>
 </head>
 <body>
 
-    <div class="card" id="main-card">
-        <h1>Привет! 👋</h1>
-        <p>Ты мне очень нравишься. Я бы очень хотел пригласить тебя на свидание. Пойдем?</p>
-        <div class="buttons">
-            <button id="yes-btn" onclick="sayYes()">Да! ❤️</button>
-            <button id="no-btn">Нет 😔</button>
-        </div>
-        <div class="success-message" id="success-msg">Ура! Я самый счастливый! 🎉</div>
+<div class="card">
+  <div id="question">
+    <h1>Привет 🌸</h1>
+    <p>Ты мне очень нравишься.<br>Хочу пригласить тебя на свидание.<br><b>Пойдёшь?</b></p>
+    <div class="buttons">
+      <button id="yes">Да ❤️</button>
+      <button id="no">Нет</button>
     </div>
+  </div>
+  <div class="done" id="done">Урааа! 🎉<br>Я самый счастливый!</div>
+</div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+<script>
+  const noBtn = document.getElementById('no');
 
-        const noBtn = document.getElementById('no-btn');
-        
-        // Функция убегания
-        function moveButton() {
-            // Получаем размеры окна и кнопки
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            const btnWidth = noBtn.offsetWidth;
-            const btnHeight = noBtn.offsetHeight;
+  function runAway() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const bw = noBtn.offsetWidth;
+    const bh = noBtn.offsetHeight;
 
-            // Вычисляем случайные координаты, чтобы кнопка не вылетела за экран
-            const randomX = Math.floor(Math.random() * (windowWidth - btnWidth));
-            const randomY = Math.floor(Math.random() * (windowHeight - btnHeight));
+    // Случайная позиция, чтобы кнопка не вылезала за экран
+    const x = Math.random() * (w - bw - 20) + 10;
+    const y = Math.random() * (h - bh - 20) + 10;
 
-            // Применяем координаты
-            noBtn.style.left = randomX + 'px';
-            noBtn.style.top = randomY + 'px';
-        }
+    noBtn.style.left = x + 'px';
+    noBtn.style.top  = y + 'px';
+  }
 
-        // События для ПК (наведение мыши) и мобильных (касание)
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Отменяем клик
-            moveButton();
-        });
+  // Ставим кнопку в случайное место сразу при загрузке
+  window.addEventListener('load', () => {
+    // небольшая задержка, чтобы размеры посчитались корректно
+    setTimeout(runAway, 50);
+  });
 
-        // Обработка нажатия "Да"
-        function sayYes() {
-            document.querySelector('.buttons').style.display = 'none';
-            document.getElementById('success-msg').style.display = 'block';
-            
-            // Отправляем данные в бота (если нужно)
-            tg.sendData(JSON.stringify({answer: "yes"}));
-            
-            // Можно закрыть приложение через 3 секунды
-            setTimeout(() => {
-                tg.close();
-            }, 3000);
-        }
-    </script>
+  // Убегает при наведении (ПК) и при касании (телефон)
+  noBtn.addEventListener('mouseover', runAway);
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    runAway();
+  });
+  // На случай клика — тоже убегает
+  noBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    runAway();
+  });
+
+  // Нажатие "Да"
+  document.getElementById('yes').addEventListener('click', () => {
+    document.getElementById('question').style.display = 'none';
+    document.getElementById('done').style.display = 'block';
+    noBtn.style.display = 'none';
+  });
+</script>
+
 </body>
 </html>
